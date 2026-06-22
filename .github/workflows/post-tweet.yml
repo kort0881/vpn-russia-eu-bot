@@ -16,6 +16,7 @@ jobs:
       - name: Install deps
         run: |
           pip install --break-system-packages -r requirements.txt
+          python -m playwright install chromium --with-deps 2>&1 | tail -5
       - name: Run
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -23,5 +24,6 @@ jobs:
           X_USERNAME: ${{ secrets.X_USERNAME }}
           X_PASSWORD: ${{ secrets.X_PASSWORD }}
           X_EMAIL: ${{ secrets.X_EMAIL }}
+          X_COOKIES: ${{ secrets.X_COOKIES }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: python src/main.py
