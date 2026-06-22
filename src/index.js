@@ -1,27 +1,41 @@
+const { fetchTelegramPosts, getLastProcessedId } = require('./telegram-fetcher');
 const { fetchNews } = require('./news-fetcher');
 const { generateTweet } = require('./tweet-generator');
-const { postTweet } = require('./twitter-client');
+const { postTweet } = require('./x-poster');
 
 async function main() {
-  try {
-    console.log('🚀 Запуск бота...');
+  console.log('🚀 Запуск бота (Telegram → X)...');
+
+  // 1. Получаем посты из Telegram
+  console.log('📡 Получение постов из Telegram...');
+  const posts = await fetchTelegramPosts(5);
+  console.log(`📰 ${posts.length} постов из Telegram`);
+
+  if (posts.length > 0) {
+    const lastPost = posts[posts.length - 1];
+    console.log('📝 Последний пост:', lastPost.text.substring(0, 100));
+
+    // 2. Собираем новости для контекста
     console.log('📡 Сбор новостей...');
-
     const news = await fetchNews();
-    console.log(`📰 Найдено ${news.length} новостей`);
+    console.log(`📰 ${news.length} новостей`);
 
-    console.log('🤖 Генерация твита через DeepSeek...');
-    const tweetText = await generateTweet(news);
-    console.log('📝 Сгенерированный твит:', tweetText);
+    // 3. Генерируем твит (через DeepSeek + пост из Telegram)
+    console.log('🤖 Генерация твита...');
+    const tweetText = await generateTweet(news, lastPost.text);
+    console.log('📝 Твит:', tweetText);
 
-    console.log('🐦 Публикация...');
+    // 4. Публикуем
+    console.log('🐦 Публикация в X...');
     await postTweet(tweetText);
-
-    console.log('✅ Готово!');
-  } catch (error) {
-    console.error('❌ Ошибка:', error);
-    process.exit(1);
+  } else {
+    console.log('⚠️ Нет новых постов в Telegram');
   }
+
+  console.log('✅ Готово');
 }
 
-main();
+main().catch(e => {
+  console.error('❌ Ошибка:', e.message);
+  process.exit(1);
+});
