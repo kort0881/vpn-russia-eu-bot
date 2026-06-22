@@ -1,36 +1,21 @@
-# VPN Russia EU Bot
+# VPN Russia EU Bot — Telegram → Twitter (X)
 
-Бот для ежедневных твитов о VPN, блокировках интернета и цифровой свободе.
+Бот: читает посты из Telegram-канала @vlesstrojan, генерирует твит через DeepSeek, публикует в X без платного API.
 
-## Как это работает
+## Как работает
 
-1. GitHub Actions запускает скрипт каждый день в 18:00 МСК
-2. Скрипт собирает новости из RSS-лент указанных источников
-3. DeepSeek API генерирует едкий твит (≤280 символов) с критикой европейских властей
-4. Твит публикуется в Twitter/X
+1. GitHub Actions запускает скрипт ежедневно в 18:00 МСК
+2. `telegram_fetcher.py` — получает последний пост из Telegram
+3. `tweet_generator.py` — DeepSeek генерирует едкий твит (критика властей ЕС)
+4. `x_poster.py` — публикует через twikit (бесплатно, без X API)
 
-## Настройка
+## Секреты GitHub
 
-1. Форкнуть/клонировать репозиторий
-2. Добавить в Settings → Secrets → Actions:
-   - `TWITTER_API_KEY`
-   - `TWITTER_API_SECRET`
-   - `TWITTER_ACCESS_TOKEN`
-   - `TWITTER_ACCESS_TOKEN_SECRET`
-   - `DEEPSEEK_API_KEY`
-3. Вручную запустить workflow через Actions → Post Daily Tweet → Run workflow
-
-## Структура
-
-```
-├── .github/workflows/post-tweet.yml   # GitHub Actions workflow
-├── src/
-│   ├── index.js                       # Главный скрипт
-│   ├── news-fetcher.js                # Сбор новостей из RSS
-│   ├── tweet-generator.js             # Генерация твита через DeepSeek
-│   ├── twitter-client.js              # Публикация в Twitter
-│   └── config.js                      # Конфигурация
-├── package.json
-├── .gitignore
-└── README.md
-```
+| Secret | Описание |
+|--------|----------|
+| `TELEGRAM_BOT_TOKEN` | Токен бота от @BotFather |
+| `TELEGRAM_CHAT_ID` | @vlesstrojan |
+| `X_USERNAME` | kort0881 |
+| `X_PASSWORD` | пароль от X |
+| `X_EMAIL` | doktorwatsone@gmail.com |
+| `DEEPSEEK_API_KEY` | Ключ DeepSeek |

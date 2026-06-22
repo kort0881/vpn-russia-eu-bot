@@ -1,8 +1,8 @@
-name: Telegram to X Post
+name: Telegram to X
 
 on:
   schedule:
-    - cron: '0 15 * * *'   # 18:00 МСК
+    - cron: '0 15 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,21 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-python@v5
         with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm install
-      - name: Run bot
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          pip install --break-system-packages -r requirements.txt
+      - name: Run
         env:
-          # Twitter (X) credentials for XActions
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           X_USERNAME: ${{ secrets.X_USERNAME }}
           X_PASSWORD: ${{ secrets.X_PASSWORD }}
           X_EMAIL: ${{ secrets.X_EMAIL }}
-          X_COOKIES: ${{ secrets.X_COOKIES }}
-          # DeepSeek for tweet generation
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          # Telegram for fetching posts
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node src/index.js
+        run: python src/main.py
