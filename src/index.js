@@ -19,9 +19,14 @@ async function main() {
     const tweetText = await generateTweet([], lastPost.text);
     console.log('📝 Твит:', tweetText);
 
-    // 4. Публикуем
+    // Публикуем
     console.log('🐦 Публикация в X...');
-    await postTweet(tweetText);
+    const result = await postTweet(tweetText);
+    if (result) {
+      console.log('✅ Опубликовано успешно');
+    } else {
+      console.log('⚠️ Публикация не удалась (лог выше)');
+    }
   } else {
     console.log('⚠️ Нет новых постов в Telegram');
   }

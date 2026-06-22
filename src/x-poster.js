@@ -1,51 +1,54 @@
-const { Scraper } = require('xactions/client');
-
 let scraper = null;
 
 /**
- * Авторизация в X через XActions
- * Использует cookies из переменных окружения (если есть)
+ * Авторизация в X через XActions (динамический import для ESM)
  */
 async function getScraper() {
   if (scraper) return scraper;
 
-  scraper = new Scraper();
+  try {
+    const { Scraper } = await import('xactions/client');
+    scraper = new Scraper();
 
-  // Если есть сохранённые cookies — используем их
-  const cookiesStr = process.env.X_COOKIES;
-  if (cookiesStr) {
-    try {
-      const cookies = JSON.parse(cookiesStr);
-      await scraper.setCookies(cookies);
-      console.log('✅ Авторизация X через cookies');
-      return scraper;
-    } catch (e) {
-      console.log('⚠️ Ошибка загрузки cookies, пробуем логин через пароль...');
+    // Если есть сохранённые cookies — используем их
+    const cookiesStr = process.env.X_COOKIES;
+    if (cookiesStr) {
+      try {
+        const cookies = JSON.parse(cookiesStr);
+        await scraper.setCookies(cookies);
+        console.log('✅ Авторизация X через cookies');
+        return scraper;
+      } catch (e) {
+        console.log('⚠️ Ошибка загрузки cookies, пробуем логин через пароль...');
+      }
     }
-  }
 
-  // Иначе логин через credentials
-  const username = process.env.X_USERNAME;
-  const password = process.env.X_PASSWORD;
-  const email = process.env.X_EMAIL;
+    // Иначе логин через credentials
+    const username = process.env.X_USERNAME;
+    const password = process.env.X_PASSWORD;
+    const email = process.env.X_EMAIL;
 
-  if (username && password) {
-    try {
-      await scraper.login(username, password, email);
-      console.log('✅ Авторизация X через логин/пароль');
+    if (username && password) {
+      try {
+        await scraper.login(username, password, email);
+        console.log('✅ Авторизация X через логин/пароль');
 
-      // Сохраняем cookies для следующих запусков
-      const cookies = await scraper.getCookies();
-      console.log('🍪 Cookies получены, можно сохранить как X_COOKIES secret');
-      return scraper;
-    } catch (e) {
-      console.error('❌ Ошибка логина в X:', e.message);
-      throw e;
+        // Сохраняем cookies для следующих запусков
+        const cookies = await scraper.getCookies();
+        console.log('🍪 Cookies получены, можно сохранить как X_COOKIES secret');
+        return scraper;
+      } catch (e) {
+        console.error('❌ Ошибка логина в X:', e.message);
+        throw e;
+      }
     }
-  }
 
-  console.log('⚠️ Нет credentials X — твиты не будут опубликованы');
-  return scraper;
+    console.log('⚠️ Нет credentials X — твиты не будут опубликованы');
+    return scraper;
+  } catch (e) {
+    console.error('❌ Ошибка загрузки XActions:', e.message);
+    return null;
+  }
 }
 
 /**
