@@ -1,5 +1,4 @@
 const { fetchTelegramPosts, getLastProcessedId } = require('./telegram-fetcher');
-const { fetchNews } = require('./news-fetcher');
 const { generateTweet } = require('./tweet-generator');
 const { postTweet } = require('./x-poster');
 
@@ -15,14 +14,9 @@ async function main() {
     const lastPost = posts[posts.length - 1];
     console.log('📝 Последний пост:', lastPost.text.substring(0, 100));
 
-    // 2. Собираем новости для контекста
-    console.log('📡 Сбор новостей...');
-    const news = await fetchNews();
-    console.log(`📰 ${news.length} новостей`);
-
-    // 3. Генерируем твит (через DeepSeek + пост из Telegram)
+    // Генерируем твит (через DeepSeek + пост из Telegram)
     console.log('🤖 Генерация твита...');
-    const tweetText = await generateTweet(news, lastPost.text);
+    const tweetText = await generateTweet([], lastPost.text);
     console.log('📝 Твит:', tweetText);
 
     // 4. Публикуем
