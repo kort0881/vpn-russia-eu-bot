@@ -17,5 +17,5 @@
 | `TELEGRAM_CHAT_ID` | @vlesstrojan |
 | `X_USERNAME` | kort0881 |
 | `X_PASSWORD` | пароль от X |
-| `X_EMAIL` | doktorwatsone@gmail.com |
+| `X_EMAIL` |
 | `DEEPSEEK_API_KEY` | Ключ DeepSeek |
