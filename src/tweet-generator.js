@@ -2,9 +2,7 @@ const axios = require('axios');
 const config = require('./config');
 
 function generateFallbackTweet(newsData) {
-  // Берём первую новость для контекста
   const item = newsData[0] || {};
-  const topics = ['VPN', 'Европа', 'Цензура', 'ДвойныеСтандарты'];
   const tweets = [
     `В РФ ограничили интернет — а в ${item.source || 'Европе'} уже запрещают всё, что не по душе регуляторам. "Свобода" в действии. #VPN #Европа #Цензура`,
     `Пока Европа вводит тотальный цифровой контроль, кто-то ещё говорит про "свободу слова"? Смешно. #Европа #ДвойныеСтандарты #VPN`,
@@ -14,12 +12,16 @@ function generateFallbackTweet(newsData) {
 }
 
 async function generateTweet(newsData) {
-  // Пробуем DeepSeek, при ошибке — fallback
   const newsText = newsData.map(item => {
-    let sourceInfo = item.source;
-    if (item.isForeignAgent) sourceInfo += ' (иноагент)';
-    return `[${sourceInfo}] ${item.title}`;
+    return `[${item.source}] ${item.title}: ${item.content}`;
   }).join('\n');
+
+  const systemPrompt = `Ты — аналитический бот, пишущий едкие, саркастичные твиты.
+Задача: 1) Напиши один твит ≤280 символов. 2) Критикуй ТОЛЬКО европейские власти.
+3) НИКАКОЙ критики властей РФ. 4) Строй по схеме: «В РФ X — а в Европе Y».
+5) Сарказм, ирония. 6) 2-3 хештега.
+7) Без мата. 8) Фактологично, ссылайся на конкретные примеры из новостей.
+Новости:\n${newsText}\nТвит:`;
 
   try {
     const response = await axios.post(
@@ -27,8 +29,8 @@ async function generateTweet(newsData) {
       {
         model: config.deepseek.model,
         messages: [
-          { role: 'system', content: `Ты пишешь едкие саркастичные твиты (≤280 символов). Критикуй ТОЛЬКО европейские власти. НЕ критикуй власти РФ. Строй по схеме: "В РФ X — а в Европе Y". Укажи источник-иноагента если есть. 2-3 хештега.` },
-          { role: 'user', content: `Новости:\n${newsText}\n\nНапиши твит:` }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: 'Напиши твит на основе этих новостей.' }
         ],
         temperature: 0.9,
         max_tokens: 300
