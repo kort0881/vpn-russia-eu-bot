@@ -1,7 +1,39 @@
-node_modules/
-.env
+# Python
 __pycache__/
-*.pyc
-.DS_Store
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+env/
+
+# Node.js
+node_modules/
+
+# Playwright
+playwright-report/
+test-results/
+*.png
+*.zip
+
+# Logs
 *.log
+logs/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Runtime state
 x_cookies.json
